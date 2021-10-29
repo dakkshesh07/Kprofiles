@@ -10,7 +10,7 @@
 static unsigned int mode = 0;
 module_param(mode, uint, 0664);
 
-unsigned int active_mode(void)
+inline unsigned int active_mode(void)
 {
   switch(mode)
     {
