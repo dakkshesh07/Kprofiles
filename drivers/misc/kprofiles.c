@@ -10,24 +10,23 @@
 static unsigned int mode = 0;
 module_param(mode, uint, 0664);
 
-
-unsigned int active_mode(void) {
-	if (mode == 1) {
-		return 1;
-	}
-
-	if (mode == 2) {
-		return 2;
-	}
-
-	if (mode == 3) {
-		return 3;
-	}
-
-	else {
-		pr_info("Invalid value passed, falling back to level 0\n");
-		return 0;
-	}
+unsigned int active_mode(void)
+{
+  switch(mode)
+    {
+    case 1:
+      return 1;
+      break;
+    case 2:
+      return 2;
+      break;
+    case 3:
+      return 3;
+      break;
+    default:
+      pr_info("Invalid value passed, falling back to level 0\n");
+      return 0;
+    }
 }
 
 MODULE_LICENSE("GPL");
