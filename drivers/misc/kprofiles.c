@@ -78,6 +78,9 @@ inline unsigned int active_mode(void)
 {
   switch(mode)
     {
+    case 0:
+      return 0;
+      break;
     case 1:
       return 1;
       break;
