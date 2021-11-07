@@ -9,8 +9,16 @@
 #include <linux/types.h>
 
 #ifdef CONFIG_KPROFILES
+void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms);
+void kprofiles_set_mode(unsigned int level);
 unsigned int active_mode(void);
 #else
+static inline void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
+{
+}
+static inline void kprofiles_set_mode(unsigned int level)
+{
+}
 static inline unsigned int active_mode(void)
 {
 	return 0;
