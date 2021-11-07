@@ -16,23 +16,26 @@
 static bool screen_on = true;
 static unsigned int mode = 0;
 static unsigned int set_mode;
+static unsigned int rollback_mode;
+static bool auto_kprofiles = true;
+module_param(auto_kprofiles, bool, 0664);
 module_param(mode, uint, 0664);
 
 void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
-	if (!level || !duration_ms)
-		return;
-	set_mode = mode;
-	mode = level;
-	msleep(duration_ms);
-	mode = set_mode;
+	if (level && duration_ms && auto_kprofiles) {
+		rollback_mode = mode;
+		mode = level;
+		msleep(duration_ms);
+		mode = rollback_mode;
+	}
+
 }
 
 void kprofiles_set_mode(unsigned int level)
 {
-	if (!level)
-		return;
-	mode = level;
+	if (level && auto_kprofiles)
+		mode = level;
 }
 
 #if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
@@ -55,13 +58,11 @@ static int common_notifier_callback(struct notifier_block *self,
 		if (!screen_on)
 			break;
 		screen_on = false;
-		mode = 1;
 		break;
 	case MSM_DRM_BLANK_UNBLANK:
 		if (screen_on)
 			break;
 		screen_on = true;
-		mode = set_mode;
 		break;
 	}
 
@@ -78,16 +79,22 @@ static int common_notifier_callback(struct notifier_block *self,
 		if (!screen_on)
 			break;
 		screen_on = false;
-		mode = 1;
 		break;
 	case FB_BLANK_UNBLANK:
 		if (screen_on)
 			break;
 		screen_on = true;
-		mode = set_mode;
 		break;
 	}
 #endif
+
+	if (!screen_on && auto_kprofiles) {
+		set_mode = mode;
+		mode = 1;
+	}
+	else if(screen_on && auto_kprofiles) {
+		mode = set_mode;
+	}
 
 out:
 	return NOTIFY_OK;
