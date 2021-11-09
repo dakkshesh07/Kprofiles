@@ -96,6 +96,7 @@ config KPROFILES
 	  If in doubt, say N.
 
 config AUTO_KPROFILES_MSM_DRM
+	bool "Enable auto kprofiles for msm drm notifier"
 	depends on KPROFILES && DRM_MSM
 	default n
 	help
@@ -105,7 +106,8 @@ config AUTO_KPROFILES_MSM_DRM
 	  to the previously used profile when screen turns on.
 
 config AUTO_KPROFILES_FB
-	depends on KPROFILES && !AUTO_KPROFILES_MSM_DRM && FB
+	bool "Enable auto kprofiles for fb notifier"
+	depends on KPROFILES && !AUTO_KPROFILES_MSM_DRM
 	default n
 	help
 	  Select this to enable automatic kprofiles switching via fb_notifier API,
