@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2021, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -599,6 +599,15 @@ static int ipa3_send_pdn_config_msg(unsigned long usr_param)
 	buff = pdn_info;
 
 	msg_meta.msg_type = pdn_info->pdn_cfg_type;
+	/* null terminate the string */
+	pdn_info->dev_name[IPA_RESOURCE_NAME_MAX - 1] = '\0';
+
+	if ((pdn_info->pdn_cfg_type < IPA_PDN_DEFAULT_MODE_CONFIG) ||
+			(pdn_info->pdn_cfg_type >= IPA_PDN_CONFIG_EVENT_MAX)) {
+		IPAERR_RL("invalid pdn_cfg_type =%d", pdn_info->pdn_cfg_type);
+		kfree(pdn_info);
+		return -EINVAL;
+	}
 
 	IPADBG("type %d, interface name: %s, enable:%d\n", msg_meta.msg_type,
 		pdn_info->dev_name, pdn_info->enable);
@@ -3077,14 +3086,20 @@ static long ipa3_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			break;
 		}
 
-		if (ep_info.max_ep_pairs != QUERY_MAX_EP_PAIRS)
+		if (ep_info.max_ep_pairs != QUERY_MAX_EP_PAIRS) {
 			IPAERR_RL("unexpected max_ep_pairs %d\n",
 			ep_info.max_ep_pairs);
+			retval = -EFAULT;
+			break;
+		}
 
-		if (ep_info.ep_pair_size !=
-			(QUERY_MAX_EP_PAIRS * sizeof(struct ipa_ep_pair_info)))
+		if (ep_info.ep_pair_size != (QUERY_MAX_EP_PAIRS *
+			sizeof(struct ipa_ep_pair_info))) {
 			IPAERR_RL("unexpected ep_pair_size %d\n",
 			ep_info.max_ep_pairs);
+			retval = -EFAULT;
+			break;
+		}
 
 		uptr = ep_info.info;
 		if (unlikely(!uptr)) {
@@ -7285,6 +7300,13 @@ static int ipa3_pre_init(const struct ipa3_plat_drv_res *resource_p,
 		result = -ENOMEM;
 		goto fail_hdr_offset_cache;
 	}
+	ipa3_ctx->fnr_stats_cache = kmem_cache_create("IPA_FNR_STATS",
+		sizeof(struct ipa_ioc_flt_rt_counter_alloc), 0, 0, NULL);
+	if (!ipa3_ctx->fnr_stats_cache) {
+		IPAERR(":ipa fnr stats cache create failed\n");
+		result = -ENOMEM;
+		goto fail_fnr_stats_cache;
+	}
 	ipa3_ctx->hdr_proc_ctx_cache = kmem_cache_create("IPA_HDR_PROC_CTX",
 		sizeof(struct ipa3_hdr_proc_ctx_entry), 0, 0, NULL);
 	if (!ipa3_ctx->hdr_proc_ctx_cache) {
@@ -7542,6 +7564,8 @@ fail_rt_tbl_cache:
 fail_hdr_proc_ctx_offset_cache:
 	kmem_cache_destroy(ipa3_ctx->hdr_proc_ctx_cache);
 fail_hdr_proc_ctx_cache:
+	kmem_cache_destroy(ipa3_ctx->fnr_stats_cache);
+fail_fnr_stats_cache:
 	kmem_cache_destroy(ipa3_ctx->hdr_offset_cache);
 fail_hdr_offset_cache:
 	kmem_cache_destroy(ipa3_ctx->hdr_cache);
