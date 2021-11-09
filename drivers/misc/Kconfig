@@ -84,6 +84,17 @@ config ATMEL_TCB_CLKSRC_BLOCK
 	  TC can be used for other purposes, such as PWM generation and
 	  interval timing.
 
+config KPROFILES
+	bool "A kernel space profile changing driver"
+	help
+	  This driver creates a sysfs toggle that can be Enabled/Disabled via userspace,
+	  It provies 4 modes, (Disabled, Battery, Balanced, Performance)
+
+	  The former can be used to disable/enable or tune kernel features
+	  according to a profile mode
+
+	  If in doubt, say N.
+
 config DUMMY_IRQ
 	tristate "Dummy IRQ handler"
 	default n
