@@ -21,7 +21,7 @@ static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
 module_param(mode, uint, 0664);
 
-void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
+inline void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
 	if (level && duration_ms && auto_kprofiles) {
 		rollback_mode = mode;
@@ -32,14 +32,14 @@ void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 
 }
 
-void kprofiles_set_mode(unsigned int level)
+inline void kprofiles_set_mode(unsigned int level)
 {
 	if (level && auto_kprofiles)
 		mode = level;
 }
 
 #if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
-static int common_notifier_callback(struct notifier_block *self,
+static inline int common_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
