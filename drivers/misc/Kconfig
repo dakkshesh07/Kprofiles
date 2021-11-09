@@ -88,7 +88,8 @@ config KPROFILES
 	bool "A kernel space profile changing driver"
 	help
 	  This driver creates a sysfs toggle that can be Enabled/Disabled via userspace,
-	  It provies 4 modes, (Disabled, Battery, Balanced, Performance)
+	  It provies 4 modes:
+	  (0, 1, 2, 3) which are (Disabled, Battery, Balanced, Performance) respectively
 
 	  The former can be used to disable/enable or tune kernel features
 	  according to a profile mode
