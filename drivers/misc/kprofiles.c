@@ -13,9 +13,13 @@
 #include <linux/fb.h>
 #endif
 
+#if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
 static bool screen_on = true;
+#endif
 static unsigned int mode = 0;
+#if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
 static unsigned int set_mode;
+#endif
 static unsigned int rollback_mode;
 static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
