@@ -107,20 +107,11 @@ out:
 
 inline unsigned int active_mode(void)
 {
-  switch(mode)
-    {
-    case 0:
-      return 0;
-    case 1:
-      return 1;
-    case 2:
-      return 2;
-    case 3:
-      return 3;
-    default:
-      pr_info("Invalid value passed, falling back to level 0\n");
-      return 0;
-    }
+  if (mode < 4)
+    return mode;
+  
+  pr_info("Invalid value passed, falling back to level 0\n");
+  return 0;
 }
 
 #if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
