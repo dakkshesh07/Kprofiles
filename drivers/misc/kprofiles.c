@@ -94,10 +94,10 @@ static inline int common_notifier_callback(struct notifier_block *self,
 
 	if (!screen_on && auto_kprofiles) {
 		set_mode = mode;
-		mode = 1;
+		kprofiles_set_mode(1);
 	}
 	else if(screen_on && auto_kprofiles) {
-		mode = set_mode;
+		kprofiles_set_mode(set_mode);
 	}
 
 out:
