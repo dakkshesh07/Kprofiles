@@ -14,6 +14,7 @@
 
 static bool screen_on = true;
 static unsigned int mode = 0;
+static unsigned int set_mode;
 module_param(mode, uint, 0664);
 
 static int msm_drm_notifier_callback(struct notifier_block *self,
@@ -41,7 +42,7 @@ static int msm_drm_notifier_callback(struct notifier_block *self,
 		if (screen_on)
 			break;
 		screen_on = true;
-		mode = 0;
+		mode = set_mode;
 		break;
 	}
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
@@ -63,7 +64,7 @@ static int msm_drm_notifier_callback(struct notifier_block *self,
 		if (screen_on)
 			break;
 		screen_on = true;
-		mode = 0;
+		mode = set_mode;
 		break;
 	}
 #endif

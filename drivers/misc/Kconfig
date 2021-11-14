@@ -101,9 +101,9 @@ config AUTO_KPROFILES_MSM_DRM
 	depends on DRM_MSM
 	help
 	  Select this to enable automatic kprofiles switching via msm_drm_notifier API,
-	  When this option is enabled kprofiles will automaticallyswitch to 
+	  When this option is enabled kprofiles will automatically switch to 
 	  battery mode when device screen turns off and switch back
-	  to default profile when screen turns on.
+	  to the previously used profile when screen turns on.
 
 config AUTO_KPROFILES_FB
 	depends on KPROFILES
@@ -111,9 +111,9 @@ config AUTO_KPROFILES_FB
 	depends on FB
 	help
 	  Select this to enable automatic kprofiles switching via fb_notifier API,
-	  When this option is enabled kprofiles will automaticallyswitch to 
+	  When this option is enabled kprofiles will automatically switch to 
 	  battery mode when device screen turns off and switch back
-	  to default profile when screen turns on.
+	  to the previously used profile when screen turns on.
 
 config DUMMY_IRQ
 	tristate "Dummy IRQ handler"
