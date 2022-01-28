@@ -17,9 +17,6 @@
 static bool screen_on = true;
 #endif
 static unsigned int mode = 0;
-#if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
-static unsigned int set_mode;
-#endif
 static unsigned int rollback_mode;
 static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
@@ -92,14 +89,6 @@ static inline int common_notifier_callback(struct notifier_block *self,
 	}
 #endif
 
-	if (!screen_on && auto_kprofiles) {
-		set_mode = mode;
-		kprofiles_set_mode(1);
-	}
-	else if(screen_on && auto_kprofiles) {
-		kprofiles_set_mode(set_mode);
-	}
-
 out:
 	return NOTIFY_OK;
 }
@@ -107,6 +96,11 @@ out:
 
 inline unsigned int active_mode(void)
 {
+#if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
+	if (!screen_on)
+		return 1;
+#endif
+
   if (mode < 4)
     return mode;
   
@@ -122,7 +116,6 @@ static struct notifier_block common_notifier_block = {
 
 static int  __init kprofiles_init(void)
 {
-	set_mode = mode;
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	msm_drm_register_client(&common_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
