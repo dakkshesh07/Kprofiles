@@ -27,6 +27,11 @@ DEFINE_MUTEX(kplock);
 
 inline void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
+
+#if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
+	if (!screen_on)
+		return;
+#endif
 	mutex_lock(&kplock);
 	if (level && duration_ms && auto_kprofiles) {
 		override_mode = level;
@@ -39,6 +44,11 @@ inline void kprofiles_set_mode_rollback(unsigned int level, unsigned int duratio
 
 inline void kprofiles_set_mode(unsigned int level)
 {
+
+#if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
+	if (!screen_on)
+		return;
+#endif
 	if (level && auto_kprofiles)
 		mode = level;
 }
