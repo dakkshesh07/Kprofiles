@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (C) 2021 Dakkshesh <dakkshesh5@gmail.com>.
+ * Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>.
+ * Copyright (C) 2021-2023 Cyber Knight <cyberknight755@gmail.com>.
  */
 
 #include <linux/module.h>
