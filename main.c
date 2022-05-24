@@ -7,7 +7,7 @@
 #include <linux/moduleparam.h>
 #include "version.h"
 
-int mode = 0;
+static int mode = 0;
 module_param(mode, uint, 0664);
 
 
