@@ -15,13 +15,12 @@
 
 static int mode = 0;
 module_param(mode, uint, 0664);
-
-static unsigned int set_mode;
 static unsigned int rollback_mode;
 static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
 
 #ifdef CONFIG_AUTO_KPROFILES
+static unsigned int set_mode;
 static bool screen_on = true;
 #endif
 
