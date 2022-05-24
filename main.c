@@ -5,6 +5,7 @@
 
 #include <linux/module.h>
 #include <linux/moduleparam.h>
+#include <linux/delay.h>
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 #include <linux/msm_drm_notify.h>
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
@@ -15,10 +16,28 @@
 static int mode = 0;
 module_param(mode, uint, 0664);
 
+static unsigned int set_mode;
+
 #ifdef CONFIG_AUTO_KPROFILES
 static bool screen_on = true;
-static unsigned int set_mode;
 #endif
+
+void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
+{
+	if (!level || !duration_ms)
+		return;
+	set_mode = mode;
+	mode = level;
+	msleep(duration_ms);
+	mode = set_mode;
+}
+
+void kprofiles_set_mode(unsigned int level)
+{
+	if (!level)
+		return;
+	mode = level;
+}
 
 #ifdef CONFIG_AUTO_KPROFILES
 static int kp_notifier_callback(struct notifier_block *self,
