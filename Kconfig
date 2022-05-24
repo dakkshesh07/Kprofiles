@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: GPL-2.0
+#
+# Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.
+
+config KPROFILES
+	tristate "Kprofiles Kernel Module"
+	default y
+	help
+	  This allows you to regulate in-kernel activities in a profile-oriented manner.
+      it creates a sysfs node which can be used to change profiles via userspace,
+	  It provides 4 profile modes, (Disabled, Battery, Balanced, Performance)
+
+	  The former can be used to disable/enable or tune kernel activities
+	  according to a profile mode. Check the README.md for more info.
+
+      It's safe to say Y here, as the driver isn't very demanding
+      and is only used when developer uses the exported API functions
+      in an another driver.
