@@ -43,7 +43,7 @@ void kprofiles_set_mode(unsigned int level)
 }
 
 #ifdef CONFIG_AUTO_KPROFILES
-static int kp_notifier_callback(struct notifier_block *self,
+static inline int kp_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data)
 {
 	if (!auto_kprofiles)
