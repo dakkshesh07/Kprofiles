@@ -119,11 +119,10 @@ inline unsigned int active_mode(void)
   if (override)
     return override_mode;
 
-  if (mode < 4)
-    return mode;
-  
-  pr_info("Invalid value passed, falling back to level 0\n");
-  return 0;
+  if (mode > 3)
+	mode = 3;
+
+  return mode;
 }
 
 #if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
