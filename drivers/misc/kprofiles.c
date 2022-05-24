@@ -111,6 +111,9 @@ out:
 
 inline unsigned int active_mode(void)
 {
+	if (mode == 0)
+		return 0;	
+	
 #if defined(CONFIG_AUTO_KPROFILES_MSM_DRM) || defined(CONFIG_AUTO_KPROFILES_FB)
 	if (!screen_on)
 		return 1;
