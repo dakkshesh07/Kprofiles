@@ -20,7 +20,6 @@ static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
 
 #ifdef CONFIG_AUTO_KPROFILES
-static unsigned int set_mode;
 static bool screen_on = true;
 #endif
 
@@ -63,14 +62,11 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 		if (!screen_on)
 			break;
 		screen_on = false;
-		set_mode = mode;
-		mode = 1;
 		break;
 	case MSM_DRM_BLANK_UNBLANK:
 		if (screen_on)
 			break;
 		screen_on = true;
-		mode = set_mode;
 		break;
 	}
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
@@ -86,14 +82,11 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 		if (!screen_on)
 			break;
 		screen_on = false;
-		set_mode = mode;
-		mode = 1;
 		break;
 	case FB_BLANK_UNBLANK:
 		if (screen_on)
 			break;
 		screen_on = true;
-		mode = set_mode;
 		break;
 	}
 #endif
@@ -105,6 +98,11 @@ out:
 
 int active_mode(void)
 {
+#ifdef CONFIG_AUTO_KPROFILES
+	if (!screen_on)
+		return 1;
+#endif
+
 	if (mode < 4)
 		return mode;
 
@@ -120,7 +118,6 @@ static int __init kp_init(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	int ret;
-	set_mode = mode;
 	ret = msm_drm_register_client(&kp_notifier_block);
 	if (ret) {
 		pr_err("Failed to register msm_drm notifier, err: %d\n", ret);
@@ -128,7 +125,6 @@ static int __init kp_init(void)
 	}
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	int ret;
-	set_mode = mode;
 	ret = fb_register_client(&kp_notifier_block);
 	if (ret) {
 		pr_err("Failed to register fb notifier, err: %d\n", ret);
