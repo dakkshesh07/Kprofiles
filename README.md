@@ -12,7 +12,7 @@
 
 ## About
 
-Kprofiles is a simple Linux kernel module that can be used to regulate in-kernel activities such as boosts that are normally not exposed to the userspace. Kprofiles operates in a profile-oriented manner So, It has four profile modes: `Disabled`, `Battery`, `Balanced`, and `Performance`. Each mode is allocated a mode number. Developers can use the Kprofiles API function in conditions to limit or enable in-kernel tasks in a certain profile mode **_(look at [usage section](#using-kprofiles-in-your-linux-kernel-source) for example)_**. Userspace can interact with Kprofiles by adjusting the mode number in `/sys/module/kprofiles/parameters/mode`. The table below shows which mode number corresponds to the profile mode.
+Kprofiles is a simple Linux kernel module that can be used to regulate in-kernel activities such as boosts that are normally not exposed to the userspace. Kprofiles operates in a profile-oriented manner So, It has four profile modes: `Disabled`, `Battery`, `Balanced`, and `Performance`. Each mode is allocated a mode number. Developers can use the Kprofiles API function in conditions to limit or enable in-kernel tasks in a certain profile mode **_(look at [usage section](#using-kprofiles-in-your-linux-kernel-source) for example)_**. Userspace can interact with Kprofiles by adjusting the mode number in `/sys/module/kprofiles/parameters/kp_mode`. The table below shows which mode number corresponds to the profile mode.
 
 | Profile Mode       | Mode Number |
 | ------------------ | ----------- |
@@ -54,10 +54,10 @@ obj-$(CONFIG_GENWQE)     += genwqe/
 obj-$(CONFIG_ECHO)       += echo/
 ```
 
-4. Define the api function you need in the required file using extern, kprofiles can be used in various places like for example boosting drivers, below is an example of using kprofiles in kernel/fork.c to control cpu and ddr boosts during zygote forking using kprofiles_active_mode() API.
+4. Define the api function you need in the required file using extern, kprofiles can be used in various places like for example boosting drivers, below is an example of using kprofiles in kernel/fork.c to control cpu and ddr boosts during zygote forking using kp_active_mode() API.
 
 ```diff
-+ extern int kprofiles_active_mode(void);
++ extern int kp_active_mode(void);
 /*
  *  Ok, this is the main fork-routine.
  *
@@ -84,11 +84,11 @@ long _do_fork(unsigned long clone_flags,
 +    * Dont boost CPU & DDR if battery saver profile is enabled
 +    * and boost CPU & DDR for 25ms if balanced profile is enabled
 +    */
-+       if (kprofiles_active_mode() == 3 || active_mode() == 0) {
++       if (kp_active_mode() == 3 || kp_active_mode() == 0) {
 +           cpu_input_boost_kick_max(50);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 50);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
-+       } else if (active_mode() == 2) {
++       } else if (kp_active_mode() == 2) {
 +           cpu_input_boost_kick_max(25);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 25);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 25);
@@ -104,9 +104,9 @@ and you are good to go!
 
 | API Function Name                                                         | Info                                                                                                                                                                   | Arguments required                                                                                                                                                              |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| kprofiles_active_mode()                                                   | This API function returns a number from 0 and 3 depending on the profile selected. It can be used in conditions to regulate boosts and other things.                   | None                                                                                                                                                                            |
-| kprofiles_set_mode(unsigned int level)                                    | This api function can be used to change profile to any given mode during any in-kernel event.                                                                          | `level` :- the mode number.                                                                                                                                                     |
-| kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms) | This api function can be used to change profile to any given mode for a specific period of time during any in-kernel event, then return to the previously active mode. | `level` :- the mode number.<br><br>`duration_ms` :- the amount of time (in milliseconds) the specified mode should be active before switching back to the previously used mode. |
+| kp_active_mode()                                                   | This API function returns a number from 0 and 3 depending on the profile selected. It can be used in conditions to regulate boosts and other things.                   | None                                                                                                                                                                            |
+| kp_set_mode(unsigned int level)                                    | This api function can be used to change profile to any given mode during any in-kernel event.                                                                          | `level` :- the mode number.                                                                                                                                                     |
+| kp_set_mode_rollback(unsigned int level, unsigned int duration_ms) | This api function can be used to change profile to any given mode for a specific period of time during any in-kernel event, then return to the previously active mode. | `level` :- the mode number.<br><br>`duration_ms` :- the amount of time (in milliseconds) the specified mode should be active before switching back to the previously used mode. |
 
 ## How To Contribute
 

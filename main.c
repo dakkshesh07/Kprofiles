@@ -13,11 +13,11 @@
 #endif
 #include "version.h"
 
-static int mode = 0;
-module_param(mode, uint, 0664);
+static int kp_mode = 0;
+module_param(kp_mode, int, 0664);
 
-static unsigned int override_mode;
-static bool override = false;
+static unsigned int kp_override_mode;
+static bool kp_override = false;
 
 static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
@@ -28,7 +28,14 @@ static bool screen_on = true;
 
 DEFINE_MUTEX(kplock);
 
-void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
+/*
+* This function can be used to change profile to any given mode 
+* for a specific period of time during any in-kernel event,
+* then return to the previously active mode.
+*
+* usage example: kp_set_mode_rollback(3, 55)
+*/
+void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
 #ifdef CONFIG_AUTO_KPROFILES
 	if (!screen_on)
@@ -37,17 +44,23 @@ void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 
 	mutex_lock(&kplock);
 	if (level && duration_ms && auto_kprofiles) {
-		override_mode = level;
-		override = true;
+		kp_override_mode = level;
+		kp_override = true;
 		msleep(duration_ms);
-		override = false;
+		kp_override = false;
 	}
 	mutex_unlock(&kplock);
 }
 
-EXPORT_SYMBOL(kprofiles_set_mode_rollback);
+EXPORT_SYMBOL(kp_set_mode_rollback);
 
-void kprofiles_set_mode(unsigned int level)
+/*
+* This function can be used to change profile to 
+* any given mode during any in-kernel event.
+*
+* usage example: kp_set_mode(3)
+*/
+void kp_set_mode(unsigned int level)
 {
 #ifdef CONFIG_AUTO_KPROFILES
 	if (!screen_on)
@@ -55,10 +68,10 @@ void kprofiles_set_mode(unsigned int level)
 #endif
 
 	if (level && auto_kprofiles)
-		mode = level;
+		kp_mode = level;
 }
 
-EXPORT_SYMBOL(kprofiles_set_mode);
+EXPORT_SYMBOL(kp_set_mode);
 
 #ifdef CONFIG_AUTO_KPROFILES
 static inline int kp_notifier_callback(struct notifier_block *self,
@@ -116,24 +129,42 @@ out:
 }
 #endif
 
-int active_mode(void)
+/*
+* This function returns a number from 0 and 3 depending on the profile 
+* selected. The former can be used in conditions to disable/enable 
+* or tune kernel features according to a profile mode.
+*
+* usage exmaple:
+*
+* if (kp_active_mode() == 3) {
+*	  things to be done when performance profile is active
+* } else if (kp_active_mode() == 2) {
+*	  things to be done when balanced profile is active
+* } else if (kp_active_mode() == 1) {
+*	  things to be done when battery profile is active
+* } else {
+*	  things to be done when kprofiles is disabled
+* }
+*
+*/
+int kp_active_mode(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES
 	if (!screen_on)
 		return 1;
 #endif
 
-	if (override)
-		return override_mode;
+	if (kp_override)
+		return kp_override_mode;
 
-	if (mode < 4)
-		return mode;
+	if (kp_mode < 4)
+		return kp_mode;
 
 	pr_info("Invalid value passed, falling back to level 0\n");
 	return 0;
 }
 
-EXPORT_SYMBOL(active_mode);
+EXPORT_SYMBOL(kp_active_mode);
 
 static struct notifier_block kp_notifier_block = {
 	.notifier_call = kp_notifier_callback,
