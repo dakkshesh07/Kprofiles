@@ -16,3 +16,43 @@ config KPROFILES
       It's safe to say Y here, as the driver isn't very demanding
       and is only used when developer uses the exported API functions
       in an another driver.
+
+if KPROFILES
+
+config AUTO_KPROFILES
+	bool
+	help
+		Selected if either of the Auto Kprofiles option is enabled.
+
+choice
+	prompt "Auto Kprofiles support"
+	default AUTO_KPROFILES_NONE
+
+config AUTO_KPROFILES_MSM_DRM
+	bool "Auto Kprofiles using msm_drm_notifier"
+	depends on DRM_MSM
+	select AUTO_KPROFILES
+	help
+	  Select this to enable Kprofile's automatic mode changer via msm_drm_notifier.
+	  When this option is enabled Kprofiles will automatically switch to
+	  battery mode when device screen turns off and switch back
+	  to previously active mode when the device wakes up.
+
+config AUTO_KPROFILES_FB
+	bool "Auto Kprofiles using fb_notifier"
+	depends on FB
+	select AUTO_KPROFILES
+	help
+	  Select this to enable Kprofile's automatic mode changer via fb_notifier.
+	  When this option is enabled Kprofiles will automatically switch to
+	  battery mode when device screen turns off and switch back
+	  to previously active mode when the device wakes up.
+
+config AUTO_KPROFILES_NONE
+	bool "None"
+	help
+	  Select this to build Kprofiles without auto Kprofiles.
+
+endchoice
+
+endif # if KPROFILES
