@@ -3,9 +3,9 @@
  * Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.
  */
 
+#include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
-#include <linux/delay.h>
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 #include <linux/msm_drm_notify.h>
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
@@ -26,13 +26,13 @@ static bool screen_on = true;
 
 void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
-	if (level && duration_ms && auto_kprofiles) {
+	if (level && duration_ms && auto_kprofiles)
+	{
 		rollback_mode = mode;
 		mode = level;
 		msleep(duration_ms);
 		mode = rollback_mode;
 	}
-
 }
 
 void kprofiles_set_mode(unsigned int level)
@@ -43,7 +43,7 @@ void kprofiles_set_mode(unsigned int level)
 
 #ifdef CONFIG_AUTO_KPROFILES
 static inline int kp_notifier_callback(struct notifier_block *self,
-				unsigned long event, void *data)
+	unsigned long event, void *data)
 {
 	if (!auto_kprofiles)
 		goto out;
