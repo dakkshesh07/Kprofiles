@@ -17,6 +17,9 @@ static int mode = 0;
 module_param(mode, uint, 0664);
 
 static unsigned int set_mode;
+static unsigned int rollback_mode;
+static bool auto_kprofiles = true;
+module_param(auto_kprofiles, bool, 0664);
 
 #ifdef CONFIG_AUTO_KPROFILES
 static bool screen_on = true;
@@ -24,25 +27,27 @@ static bool screen_on = true;
 
 void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
-	if (!level || !duration_ms)
-		return;
-	set_mode = mode;
-	mode = level;
-	msleep(duration_ms);
-	mode = set_mode;
+	if (level && duration_ms && auto_kprofiles) {
+		rollback_mode = mode;
+		mode = level;
+		msleep(duration_ms);
+		mode = rollback_mode;
+	}
+
 }
 
 void kprofiles_set_mode(unsigned int level)
 {
-	if (!level)
-		return;
-	mode = level;
+	if (level && auto_kprofiles)
+		mode = level;
 }
 
 #ifdef CONFIG_AUTO_KPROFILES
 static int kp_notifier_callback(struct notifier_block *self,
 				unsigned long event, void *data)
 {
+	if (!auto_kprofiles)
+		goto out;
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	struct msm_drm_notifier *evdata = data;
 	int *blank;
