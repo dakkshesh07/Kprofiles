@@ -15,7 +15,10 @@
 
 static int mode = 0;
 module_param(mode, uint, 0664);
-static unsigned int rollback_mode;
+
+static unsigned int override_mode;
+static bool override = false;
+
 static bool auto_kprofiles = true;
 module_param(auto_kprofiles, bool, 0664);
 
@@ -23,15 +26,18 @@ module_param(auto_kprofiles, bool, 0664);
 static bool screen_on = true;
 #endif
 
+DEFINE_MUTEX(kplock);
+
 void kprofiles_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
-	if (level && duration_ms && auto_kprofiles)
-	{
-		rollback_mode = mode;
-		mode = level;
+	mutex_lock(&kplock);
+	if (level && duration_ms && auto_kprofiles) {
+		override_mode = level;
+		override = true;
 		msleep(duration_ms);
-		mode = rollback_mode;
+		override = false;
 	}
+	mutex_unlock(&kplock);
 }
 
 void kprofiles_set_mode(unsigned int level)
@@ -102,6 +108,9 @@ int active_mode(void)
 	if (!screen_on)
 		return 1;
 #endif
+
+	if (override)
+		return override_mode;
 
 	if (mode < 4)
 		return mode;
