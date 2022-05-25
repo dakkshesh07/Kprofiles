@@ -190,14 +190,13 @@ static int __init kp_init(void)
 	return 0;
 }
 
-static int __exit kp_exit(void)
+static void __exit kp_exit(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	msm_drm_unregister_client(&kp_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	fb_unregister_client(&kp_notifier_block);
 #endif
-	return 0;
 }
 
 module_init(kp_init);
