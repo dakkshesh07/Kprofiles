@@ -77,8 +77,6 @@ EXPORT_SYMBOL(kp_set_mode);
 static inline int kp_notifier_callback(struct notifier_block *self,
 	unsigned long event, void *data)
 {
-	if (!auto_kprofiles)
-		goto out;
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	struct msm_drm_notifier *evdata = data;
 	int *blank;
@@ -150,7 +148,7 @@ out:
 int kp_active_mode(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES
-	if (!screen_on)
+	if (!screen_on && auto_kprofiles)
 		return 1;
 #endif
 
