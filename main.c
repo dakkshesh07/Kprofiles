@@ -185,6 +185,8 @@ static int __init kp_init(void)
 		fb_unregister_client(&kp_notifier_block);
 	}
 #endif
+	pr_info("Kprofiles " KPROFILES_VERSION " loaded. Visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md for information.\n");
+	pr_info("Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.\n");
 	return 0;
 }
 
