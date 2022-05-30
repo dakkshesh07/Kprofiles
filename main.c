@@ -73,6 +73,43 @@ void kp_set_mode(unsigned int level)
 
 EXPORT_SYMBOL(kp_set_mode);
 
+/*
+* This function returns a number from 0 and 3 depending on the profile 
+* selected. The former can be used in conditions to disable/enable 
+* or tune kernel features according to a profile mode.
+*
+* usage exmaple:
+*
+* if (kp_active_mode() == 3) {
+*	  things to be done when performance profile is active
+* } else if (kp_active_mode() == 2) {
+*	  things to be done when balanced profile is active
+* } else if (kp_active_mode() == 1) {
+*	  things to be done when battery profile is active
+* } else {
+*	  things to be done when kprofiles is disabled
+* }
+*
+*/
+int kp_active_mode(void)
+{
+#ifdef CONFIG_AUTO_KPROFILES
+	if (!screen_on && auto_kprofiles)
+		return 1;
+#endif
+
+	if (kp_override)
+		return kp_override_mode;
+
+	if (kp_mode < 4)
+		return kp_mode;
+
+	pr_info("Invalid value passed, falling back to level 0\n");
+	return 0;
+}
+
+EXPORT_SYMBOL(kp_active_mode);
+
 #ifdef CONFIG_AUTO_KPROFILES
 static inline int kp_notifier_callback(struct notifier_block *self,
 				       unsigned long event, void *data)
@@ -125,60 +162,24 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 out:
 	return NOTIFY_OK;
 }
-#endif
-
-/*
-* This function returns a number from 0 and 3 depending on the profile 
-* selected. The former can be used in conditions to disable/enable 
-* or tune kernel features according to a profile mode.
-*
-* usage exmaple:
-*
-* if (kp_active_mode() == 3) {
-*	  things to be done when performance profile is active
-* } else if (kp_active_mode() == 2) {
-*	  things to be done when balanced profile is active
-* } else if (kp_active_mode() == 1) {
-*	  things to be done when battery profile is active
-* } else {
-*	  things to be done when kprofiles is disabled
-* }
-*
-*/
-int kp_active_mode(void)
-{
-#ifdef CONFIG_AUTO_KPROFILES
-	if (!screen_on && auto_kprofiles)
-		return 1;
-#endif
-
-	if (kp_override)
-		return kp_override_mode;
-
-	if (kp_mode < 4)
-		return kp_mode;
-
-	pr_info("Invalid value passed, falling back to level 0\n");
-	return 0;
-}
-
-EXPORT_SYMBOL(kp_active_mode);
 
 static struct notifier_block kp_notifier_block = {
 	.notifier_call = kp_notifier_callback,
 };
 
+#endif
+
 static int __init kp_init(void)
 {
+	int ret = 0;
+
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
-	int ret;
 	ret = msm_drm_register_client(&kp_notifier_block);
 	if (ret) {
 		pr_err("Failed to register msm_drm notifier, err: %d\n", ret);
 		msm_drm_unregister_client(&kp_notifier_block);
 	}
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
-	int ret;
 	ret = fb_register_client(&kp_notifier_block);
 	if (ret) {
 		pr_err("Failed to register fb notifier, err: %d\n", ret);
@@ -188,7 +189,7 @@ static int __init kp_init(void)
 	pr_info("Kprofiles " KPROFILES_VERSION
 		" loaded. Visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md for information.\n");
 	pr_info("Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.\n");
-	return 0;
+	return ret;
 }
 
 static void __exit kp_exit(void)
