@@ -2,15 +2,22 @@
     <!-- Base application theme. -->
     <style name="Theme.KProfiles" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorPrimary">@color/colorPrimary_dark</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark_dark</item>
+        <item name="colorOnPrimary">@color/colorAccent_dark</item>
+
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+
         <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="buttonStyle">@style/Theme.ButtonStyle</item>
+        <item name="materialButtonStyle">@style/Theme.ButtonStyle</item>
+    </style>
+
+    <style name="Theme.ButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/textColor</item>
     </style>
 </resources>
