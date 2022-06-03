@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">KProfiles</string>
+
+    <string name="enable_kprofiles">Auto KProfiles</string>
+    <string name="mode_chooser">Choose youre mode</string>
+    <string name="apply">APPLY</string>
+
+    <string name="kp_disabled">KProfile: Mode disabled</string>
+    <string name="kp_battery">KProfile: Mode battery</string>
+    <string name="kp_balanced">KProfile: Mode balanced</string>
+    <string name="kp_performance">KProfile: Mode performance</string>
+
+    <string name="kp_unknown">KProfile: Mode unknown</string>
+    <!-- Spinner choices -->
+    <string-array name="functions">
+        <item>None</item>
+        <item>Disabled</item>
+        <item>Battery</item>
+        <item>Balanced</item>
+        <item>Performance</item>
+    </string-array>
+</resources>
