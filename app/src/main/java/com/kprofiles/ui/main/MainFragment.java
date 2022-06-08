@@ -32,7 +32,7 @@ public class MainFragment extends Fragment {
 
     // Exported node path's
     private static final String KP_AUTO_NODE = "/sys/module/kprofiles/parameters/auto_kprofiles";
-    private static final String KP_MODE_NODE = "/sys/module/kprofiles/parameters/mode";
+    private static final String KP_MODE_NODE = "/sys/module/kprofiles/parameters/kp_mode";
 
     // Exported key's
     private static final String AUTO_ENABLE = "Y";
