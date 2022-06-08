@@ -2,7 +2,7 @@
     <string name="app_name">KProfiles</string>
 
     <string name="enable_kprofiles">Auto KProfiles</string>
-    <string name="mode_chooser">Choose youre mode</string>
+    <string name="mode_chooser">Choose the mode you want to switch to:</string>
     <string name="apply">APPLY</string>
 
     <string name="kp_disabled">KProfile: Mode disabled</string>
