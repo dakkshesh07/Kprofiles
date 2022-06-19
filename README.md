@@ -119,6 +119,8 @@ This project is licensed under GPL-2.0.
 
 ## Team
 
-- [Dakkshesh](https://t.me/Dakkshesh07) : kernel module Author/Maintainer
-- [cyberknight777](https://t.me/cyberknight777) : kernel module Co-Maintainer | Kprofiles Manager (WIP) Maintainer
-- [Vyom Desai](https://t.me/CannedShroud) : Kprofiles Manager (WIP) Author/Maintainer
+- [Dakkshesh](https://github.com/dakkshesh07) : kernel module Author/Maintainer
+- [Cyberknight777](https://github.com/cyberknight777) : kernel module Co-Maintainer | Kprofiles Manager Maintainer
+- [Vyom Desai](https://github.com/CannedShroud) : Kprofiles Manager [(rom package)](https://github.com/CannedShroud/android_packages_apps_KProfiles) Author/Maintainer
+- [Martin Valba](https://github.com/Martinvlba) : Kprofiles Manager [(standalone app)](https://github.com/dakkshesh07/Kprofiles/tree/app) Author/Maintainer
+- [Someone5678](https://github.com/someone5678) : Kprofiles Manager [(rom package)](https://github.com/CannedShroud/android_packages_apps_KProfiles) Co-Maintainer
