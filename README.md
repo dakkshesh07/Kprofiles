@@ -46,11 +46,11 @@ source "drivers/misc/echo/Kconfig"
 endmenu
 ```
 
-3. Modify =drivers/misc/Makefile=
+3. Modify `drivers/misc/Makefile`
 
 ```diff
 obj-$(CONFIG_GENWQE)     += genwqe/
-+obj-$(CONFIG_KPROFILES) += kprofiles
++obj-$(CONFIG_KPROFILES) += kprofiles/
 obj-$(CONFIG_ECHO)       += echo/
 ```
 
