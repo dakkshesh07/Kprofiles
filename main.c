@@ -101,11 +101,12 @@ int kp_active_mode(void)
 	if (kp_override)
 		return kp_override_mode;
 
-	if (kp_mode < 4)
-		return kp_mode;
+	if (kp_mode > 3) {
+		kp_mode = 0;
+		pr_info("Invalid value passed, falling back to level 0\n");
+	}
 
-	pr_info("Invalid value passed, falling back to level 0\n");
-	return 0;
+	return kp_mode;
 }
 
 EXPORT_SYMBOL(kp_active_mode);
