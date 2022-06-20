@@ -13,7 +13,7 @@
 #endif
 #include "version.h"
 
-static int kp_mode = 0;
+static int kp_mode = CONFIG_DEFAULT_KP_MODE;
 module_param(kp_mode, int, 0664);
 
 static unsigned int kp_override_mode;
