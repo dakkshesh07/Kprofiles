@@ -50,7 +50,7 @@ endmenu
 
 ```diff
 obj-$(CONFIG_GENWQE)     += genwqe/
-+obj-$(CONFIG_KPROFILES) += kprofiles
++obj-$(CONFIG_KPROFILES) += kprofiles/
 obj-$(CONFIG_ECHO)       += echo/
 ```
 
