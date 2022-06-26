@@ -13,13 +13,13 @@
 #endif
 #include "version.h"
 
-static int kp_mode = 0;
+static int kp_mode = CONFIG_DEFAULT_KP_MODE;
 module_param(kp_mode, int, 0664);
 
 static unsigned int kp_override_mode;
 static bool kp_override = false;
 
-static bool auto_kprofiles = true;
+static bool auto_kprofiles __read_mostly = true;
 module_param(auto_kprofiles, bool, 0664);
 
 #ifdef CONFIG_AUTO_KPROFILES
