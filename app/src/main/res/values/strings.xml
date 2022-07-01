@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KProfiles</string>
+    <string name="app_name">KProfiles Manager</string>
 
     <string name="enable_kprofiles">Auto KProfiles: </string>
     <string name="mode_chooser">KProfile mode: </string>
