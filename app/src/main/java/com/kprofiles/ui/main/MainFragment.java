@@ -73,20 +73,26 @@ public class MainFragment extends Fragment {
         final AppCompatSpinner kprofile_mode = promptView.findViewById(R.id.kprofile_mode);
         final MaterialButton mode_apply = promptView.findViewById(R.id.mode_apply);
 
+        // TODO: Fix the auto + mode save/load so its tracked by system changes ( QS Tile or 3party apps )
+        //// BAD CODE START
         // Load modes from nodes and save them with sharedpref
         //// KProfile auto node
         List<String> node_kp_auto_result = new ArrayList<>();
         Shell.cmd("cat " + KP_AUTO_NODE).to(node_kp_auto_result).exec();
         String node_kp_auto_result_new = ShellStringProcess(node_kp_auto_result);
-        sharedpreferences.edit().remove("kp_auto").apply();
-        sharedpreferences.edit().putString("kp_auto", String.valueOf(node_kp_auto_result_new)).apply();
+        Log.d("ShellStringProcess:", node_kp_auto_result_new);
+        // commented so it wont break save/load
+        //sharedpreferences.edit().remove("kp_auto").apply();
+        //sharedpreferences.edit().putString("kp_auto", String.valueOf(node_kp_auto_result_new)).apply();
 
         //// KProfile mode node
         List<String> node_kp_node_result = new ArrayList<>();
         Shell.cmd("cat " + KP_MODE_NODE).to(node_kp_node_result).exec();
         String node_kp_node_result_new = ShellStringProcess(node_kp_node_result);
-        sharedpreferences.edit().remove("kp_mode").apply();
-        sharedpreferences.edit().putString("kp_mode", String.valueOf(node_kp_node_result_new)).apply();
+        // commented so it wont break save/load
+        //sharedpreferences.edit().remove("kp_mode").apply();
+        //sharedpreferences.edit().putString("kp_mode", String.valueOf(node_kp_node_result_new)).apply();
+        ////BAD CODE END
 
         // Check weather sharedpref's have values and set them as they are. Otherwise disable everything to stock
         //// KP Auto ( doesn't reapply actual function but just moves the switch where user defined it to be )
@@ -161,7 +167,7 @@ public class MainFragment extends Fragment {
                 Shell.cmd("echo " + DISABLED + " > " + KP_MODE_NODE).exec();
             } else if (sharedpreferences.getString("kp_mode", "Battery").equals("Battery")) {
                 Log.d("This is:", "Battery");
-                Shell.cmd("echo 0 " + BATTERY + " > " + KP_MODE_NODE).exec();
+                Shell.cmd("echo " + BATTERY + " > " + KP_MODE_NODE).exec();
             } else if (sharedpreferences.getString("kp_mode", "Balanced").equals("Balanced")) {
                 Log.d("This is:", "Balanced");
                 Shell.cmd("echo " + BALANCED + " > " + KP_MODE_NODE).exec();

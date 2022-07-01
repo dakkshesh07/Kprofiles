@@ -77,9 +77,10 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
+                android:entries="@array/functions"
                 android:gravity="center"
                 android:prompt="@string/mode_chooser"
-                android:entries="@array/functions"/>
+                tools:ignore="TouchTargetSizeCheck" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/mode_apply"
