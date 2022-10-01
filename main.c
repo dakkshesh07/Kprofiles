@@ -13,18 +13,17 @@
 #endif
 #include "version.h"
 
-static int kp_mode = CONFIG_DEFAULT_KP_MODE;
-module_param(kp_mode, int, 0664);
-
 static unsigned int kp_override_mode;
 static bool kp_override = false;
+#ifdef CONFIG_AUTO_KPROFILES
+static bool screen_on = true;
+#endif
 
 static bool auto_kprofiles __read_mostly = true;
 module_param(auto_kprofiles, bool, 0664);
 
-#ifdef CONFIG_AUTO_KPROFILES
-static bool screen_on = true;
-#endif
+static int kp_mode = CONFIG_DEFAULT_KP_MODE;
+module_param(kp_mode, int, 0664);
 
 DEFINE_MUTEX(kplock);
 
@@ -119,11 +118,9 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 	struct msm_drm_notifier *evdata = data;
 	int *blank;
 
-	if (event != MSM_DRM_EVENT_BLANK)
-		goto out;
-
-	if (!evdata || !evdata->data || evdata->id != MSM_DRM_PRIMARY_DISPLAY)
-		goto out;
+	if (event != MSM_DRM_EVENT_BLANK || !evdata || 
+		!evdata->data || evdata->id != MSM_DRM_PRIMARY_DISPLAY)
+		return NOTIFY_OK;
 
 	blank = evdata->data;
 	switch (*blank) {
@@ -143,7 +140,7 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 	int *blank;
 
 	if (event != FB_EVENT_BLANK)
-		goto out;
+		return NOTIFY_OK;
 
 	blank = evdata->data;
 	switch (*blank) {
@@ -160,7 +157,6 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 	}
 #endif
 
-out:
 	return NOTIFY_OK;
 }
 
@@ -168,32 +164,20 @@ static struct notifier_block kp_notifier_block = {
 	.notifier_call = kp_notifier_callback,
 };
 
-#endif
-
-static int __init kp_init(void)
+static int kprofiles_register_notifier(void)
 {
 	int ret = 0;
 
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	ret = msm_drm_register_client(&kp_notifier_block);
-	if (ret) {
-		pr_err("Failed to register msm_drm notifier, err: %d\n", ret);
-		msm_drm_unregister_client(&kp_notifier_block);
-	}
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	ret = fb_register_client(&kp_notifier_block);
-	if (ret) {
-		pr_err("Failed to register fb notifier, err: %d\n", ret);
-		fb_unregister_client(&kp_notifier_block);
-	}
 #endif
-	pr_info("Kprofiles " KPROFILES_VERSION
-		" loaded. Visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md for information.\n");
-	pr_info("Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.\n");
+
 	return ret;
 }
 
-static void __exit kp_exit(void)
+static void kprofiles_unregister_notifier(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	msm_drm_unregister_client(&kp_notifier_block);
@@ -202,8 +186,33 @@ static void __exit kp_exit(void)
 #endif
 }
 
+#else
+static inline int kprofiles_register_notifier(void) { return 0; }
+static inline void kprofiles_unregister_notifier(void) { }
+#endif
+
+static int __init kp_init(void)
+{
+	int ret = 0;
+
+	ret = kprofiles_register_notifier();
+	if (ret)
+		pr_err("Failed to register notifier, err: %d\n", ret);
+
+	pr_info("Kprofiles " KPROFILES_VERSION
+		" loaded. Visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md for information.\n");
+	pr_info("Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.\n");
+
+	return ret;
+}
 module_init(kp_init);
+
+static void __exit kp_exit(void)
+{
+	kprofiles_unregister_notifier();
+}
 module_exit(kp_exit);
+
 MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("KernelSpace Profiles");
 MODULE_AUTHOR("Dakkshesh <dakkshesh5@gmail.com>");
