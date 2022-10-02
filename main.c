@@ -13,6 +13,16 @@
 #endif
 #include "version.h"
 
+#ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
+#define KP_EVENT_BLANK MSM_DRM_EVENT_BLANK
+#define KP_BLANK_POWERDOWN MSM_DRM_BLANK_POWERDOWN
+#define KP_BLANK_UNBLANK MSM_DRM_BLANK_UNBLANK
+#elif defined(CONFIG_AUTO_KPROFILES_FB)
+#define KP_EVENT_BLANK FB_EVENT_BLANK
+#define KP_BLANK_POWERDOWN FB_BLANK_POWERDOWN
+#define KP_BLANK_UNBLANK FB_BLANK_UNBLANK
+#endif
+
 static unsigned int kp_override_mode;
 static bool kp_override = false;
 #ifdef CONFIG_AUTO_KPROFILES
@@ -116,46 +126,32 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	struct msm_drm_notifier *evdata = data;
-	int *blank;
-
-	if (event != MSM_DRM_EVENT_BLANK || !evdata || 
-		!evdata->data || evdata->id != MSM_DRM_PRIMARY_DISPLAY)
-		return NOTIFY_OK;
-
-	blank = evdata->data;
-	switch (*blank) {
-	case MSM_DRM_BLANK_POWERDOWN:
-		if (!screen_on)
-			break;
-		screen_on = false;
-		break;
-	case MSM_DRM_BLANK_UNBLANK:
-		if (screen_on)
-			break;
-		screen_on = true;
-		break;
-	}
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	struct fb_event *evdata = data;
+#endif
 	int *blank;
 
-	if (event != FB_EVENT_BLANK)
+	if (event != KP_EVENT_BLANK
+#ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
+		|| !evdata || !evdata->data
+		|| evdata->id != MSM_DRM_PRIMARY_DISPLAY
+#endif
+	)
 		return NOTIFY_OK;
 
 	blank = evdata->data;
 	switch (*blank) {
-	case FB_BLANK_POWERDOWN:
+	case KP_BLANK_POWERDOWN:
 		if (!screen_on)
 			break;
 		screen_on = false;
 		break;
-	case FB_BLANK_UNBLANK:
+	case KP_BLANK_UNBLANK:
 		if (screen_on)
 			break;
 		screen_on = true;
 		break;
 	}
-#endif
 
 	return NOTIFY_OK;
 }
