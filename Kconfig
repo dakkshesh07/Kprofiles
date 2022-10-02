@@ -44,6 +44,16 @@ config AUTO_KPROFILES_MSM_DRM
 	  mode when device screen turns off and will switch back to previously active
 	  mode when the device wakes up.
 
+config AUTO_KPROFILES_MI_DRM
+	bool "Auto Kprofiles using mi_drm_notifier"
+	depends on !DRM_MSM
+	select AUTO_KPROFILES
+	help
+	  Select this to enable Kprofile's automatic mode changer via mi_drm_notifier.
+	  When this option is enabled, Kprofiles will automatically switch to battery
+	  mode when device screen turns off and will switch back to previously active
+	  mode when the device wakes up.
+
 config AUTO_KPROFILES_FB
 	bool "Auto Kprofiles using fb_notifier"
 	depends on FB

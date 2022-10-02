@@ -8,6 +8,8 @@
 #include <linux/moduleparam.h>
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 #include <linux/msm_drm_notify.h>
+#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
+#include <drm/drm_notifier_mi.h>
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 #include <linux/fb.h>
 #endif
@@ -17,6 +19,10 @@
 #define KP_EVENT_BLANK MSM_DRM_EVENT_BLANK
 #define KP_BLANK_POWERDOWN MSM_DRM_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK MSM_DRM_BLANK_UNBLANK
+#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
+#define KP_EVENT_BLANK MI_DRM_EVENT_BLANK
+#define KP_BLANK_POWERDOWN MI_DRM_BLANK_POWERDOWN
+#define KP_BLANK_UNBLANK MI_DRM_BLANK_UNBLANK
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 #define KP_EVENT_BLANK FB_EVENT_BLANK
 #define KP_BLANK_POWERDOWN FB_BLANK_POWERDOWN
@@ -126,6 +132,8 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	struct msm_drm_notifier *evdata = data;
+#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
+	struct mi_drm_notifier *evdata = data;
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	struct fb_event *evdata = data;
 #endif
@@ -166,6 +174,8 @@ static int kprofiles_register_notifier(void)
 
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	ret = msm_drm_register_client(&kp_notifier_block);
+#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
+	ret = mi_drm_register_client(&kp_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	ret = fb_register_client(&kp_notifier_block);
 #endif
@@ -177,6 +187,8 @@ static void kprofiles_unregister_notifier(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	msm_drm_unregister_client(&kp_notifier_block);
+#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
+	mi_drm_unregister_client(&kp_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 	fb_unregister_client(&kp_notifier_block);
 #endif
