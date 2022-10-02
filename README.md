@@ -21,7 +21,7 @@ Kprofiles is a simple Linux kernel module that can be used to regulate in-kernel
 | Balanced           | 2           |
 | Performance        | 3           |
 
-Furthermore, Kprofiles provides automatic profile changer (auto Kprofiles), which uses `FB notifier` or `MSM DRM notifier` to enforce battery profile mode when the device's screen goes off and switches back to previously active mode when the device wakes up. Users can disable or enable this feature at runtime without recompiling the kernel by changing the bool value in `/sys/module/kprofiles/parameters/auto_kprofiles`
+Furthermore, Kprofiles provides automatic profile changer (auto Kprofiles), which uses `FB notifier`, `MSM DRM notifier` or `MI DRM notifier` to enforce battery profile mode when the device's screen goes off and switches back to previously active mode when the device wakes up. Users can disable or enable this feature at runtime without recompiling the kernel by changing the bool value in `/sys/module/kprofiles/parameters/auto_kprofiles`
 
 Kprofiles additionally has API functions for switching profiles in response to any in-kernel event. For further information, please see the table of [Available APIs](#available-apis)
 
