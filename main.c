@@ -38,7 +38,7 @@ static bool screen_on = true;
 static bool auto_kprofiles __read_mostly = true;
 module_param(auto_kprofiles, bool, 0664);
 
-static int kp_mode = CONFIG_DEFAULT_KP_MODE;
+static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
 module_param(kp_mode, int, 0664);
 
 DEFINE_MUTEX(kplock);
