@@ -127,8 +127,8 @@ int kp_active_mode(void)
 EXPORT_SYMBOL(kp_active_mode);
 
 #ifdef CONFIG_AUTO_KPROFILES
-static inline int kp_notifier_callback(struct notifier_block *self,
-				       unsigned long event, void *data)
+static int kp_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	struct msm_drm_notifier *evdata = data;
