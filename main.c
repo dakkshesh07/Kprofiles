@@ -141,8 +141,7 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 
 	if (event != KP_EVENT_BLANK
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
-		|| !evdata || !evdata->data
-		|| evdata->id != MSM_DRM_PRIMARY_DISPLAY
+	    || !evdata || !evdata->data || evdata->id != MSM_DRM_PRIMARY_DISPLAY
 #endif
 	)
 		return NOTIFY_OK;
@@ -195,8 +194,13 @@ static void kprofiles_unregister_notifier(void)
 }
 
 #else
-static inline int kprofiles_register_notifier(void) { return 0; }
-static inline void kprofiles_unregister_notifier(void) { }
+static inline int kprofiles_register_notifier(void)
+{
+	return 0;
+}
+static inline void kprofiles_unregister_notifier(void)
+{
+}
 #endif
 
 static int __init kp_init(void)
