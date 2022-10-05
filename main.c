@@ -57,6 +57,12 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 		return;
 #endif
 
+	if (unlikely(level > 3)) {
+		pr_err("%s: Invalid mode requested, Skipping mode change",
+		       __func__);
+		return;
+	}
+
 	mutex_lock(&kplock);
 	if (level && duration_ms && auto_kprofiles) {
 		kp_override_mode = level;
@@ -81,6 +87,12 @@ void kp_set_mode(unsigned int level)
 	if (!screen_on)
 		return;
 #endif
+
+	if (unlikely(level > 3)) {
+		pr_err("%s: Invalid mode requested, Skipping mode change",
+		       __func__);
+		return;
+	}
 
 	if (level && auto_kprofiles)
 		kp_mode = level;
