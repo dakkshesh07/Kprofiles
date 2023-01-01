@@ -33,6 +33,13 @@ config AUTO_KPROFILES
 choice
 	prompt "Auto Kprofiles support"
 	default AUTO_KPROFILES_NONE
+	help
+	  This option toggles the automated mode changer in Kprofile. When enabled,
+	  Kprofiles will utilise the notifier API(s) to transition between presently
+	  active mode and battery mode based on the device's screen state. Because
+	  of notifier API requirements, it is disabled by default.
+
+	  If unsure, select AUTO_KPROFILES_NONE.
 
 config AUTO_KPROFILES_MSM_DRM
 	bool "Auto Kprofiles using msm_drm_notifier"

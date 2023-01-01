@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (C) 2021-2022 Dakkshesh <dakkshesh5@gmail.com>.
  */
@@ -30,7 +30,7 @@
 #endif
 
 static unsigned int kp_override_mode;
-static bool kp_override = false;
+static bool kp_override;
 #ifdef CONFIG_AUTO_KPROFILES
 static bool screen_on = true;
 #endif
@@ -44,12 +44,12 @@ module_param(kp_mode, int, 0664);
 DEFINE_MUTEX(kplock);
 
 /*
-* This function can be used to change profile to any given mode 
-* for a specific period of time during any in-kernel event,
-* then return to the previously active mode.
-*
-* usage example: kp_set_mode_rollback(3, 55)
-*/
+ * This function can be used to change profile to any given mode
+ * for a specific period of time during any in-kernel event,
+ * then return to the previously active mode.
+ *
+ * usage example: kp_set_mode_rollback(3, 55)
+ */
 void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
 #ifdef CONFIG_AUTO_KPROFILES
@@ -73,15 +73,14 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 	kp_override = false;
 	mutex_unlock(&kplock);
 }
-
 EXPORT_SYMBOL(kp_set_mode_rollback);
 
 /*
-* This function can be used to change profile to 
-* any given mode during any in-kernel event.
-*
-* usage example: kp_set_mode(3)
-*/
+ * This function can be used to change profile to
+ * any given mode during any in-kernel event.
+ *
+ * usage example: kp_set_mode(3)
+ */
 void kp_set_mode(unsigned int level)
 {
 #ifdef CONFIG_AUTO_KPROFILES
@@ -98,27 +97,26 @@ void kp_set_mode(unsigned int level)
 	if (auto_kprofiles)
 		kp_mode = level;
 }
-
 EXPORT_SYMBOL(kp_set_mode);
 
 /*
-* This function returns a number from 0 and 3 depending on the profile 
-* selected. The former can be used in conditions to disable/enable 
-* or tune kernel features according to a profile mode.
-*
-* usage exmaple:
-*
-* if (kp_active_mode() == 3) {
-*	  things to be done when performance profile is active
-* } else if (kp_active_mode() == 2) {
-*	  things to be done when balanced profile is active
-* } else if (kp_active_mode() == 1) {
-*	  things to be done when battery profile is active
-* } else {
-*	  things to be done when kprofiles is disabled
-* }
-*
-*/
+ * This function returns a number from 0 and 3 depending on the profile
+ * selected. The former can be used in conditions to disable/enable
+ * or tune kernel features according to a profile mode.
+ *
+ * usage exmaple:
+ *
+ * if (kp_active_mode() == 3) {
+ *	  things to be done when performance profile is active
+ * } else if (kp_active_mode() == 2) {
+ *	  things to be done when balanced profile is active
+ * } else if (kp_active_mode() == 1) {
+ *	  things to be done when battery profile is active
+ * } else {
+ *	  things to be done when kprofiles is disabled
+ * }
+ *
+ */
 int kp_active_mode(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES
@@ -136,7 +134,6 @@ int kp_active_mode(void)
 
 	return kp_mode;
 }
-
 EXPORT_SYMBOL(kp_active_mode);
 
 #ifdef CONFIG_AUTO_KPROFILES
