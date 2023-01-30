@@ -137,16 +137,20 @@ int kp_active_mode(void)
 EXPORT_SYMBOL(kp_active_mode);
 
 #ifdef CONFIG_AUTO_KPROFILES
+
+#ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
+#define kprofiles_events msm_drm_notifier
+#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
+#define kprofiles_events mi_drm_notifier
+#elif defined(CONFIG_AUTO_KPROFILES_FB)
+#define kprofiles_events fb_event
+#endif
+
 static inline int kp_notifier_callback(struct notifier_block *self,
 				       unsigned long event, void *data)
 {
-#ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
-	struct msm_drm_notifier *evdata = data;
-#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
-	struct mi_drm_notifier *evdata = data;
-#elif defined(CONFIG_AUTO_KPROFILES_FB)
-	struct fb_event *evdata = data;
-#endif
+
+	struct kprofiles_events *evdata = data;
 	int *blank;
 
 	if (event != KP_EVENT_BLANK
