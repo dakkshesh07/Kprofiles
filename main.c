@@ -19,14 +19,17 @@
 #define KP_EVENT_BLANK MSM_DRM_EVENT_BLANK
 #define KP_BLANK_POWERDOWN MSM_DRM_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK MSM_DRM_BLANK_UNBLANK
+#define kprofiles_events msm_drm_notifier
 #elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
 #define KP_EVENT_BLANK MI_DRM_EVENT_BLANK
 #define KP_BLANK_POWERDOWN MI_DRM_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK MI_DRM_BLANK_UNBLANK
+#define kprofiles_events mi_drm_notifier
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 #define KP_EVENT_BLANK FB_EVENT_BLANK
 #define KP_BLANK_POWERDOWN FB_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK FB_BLANK_UNBLANK
+#define kprofiles_events fb_event
 #endif
 
 static unsigned int kp_override_mode;
@@ -137,19 +140,9 @@ int kp_active_mode(void)
 EXPORT_SYMBOL(kp_active_mode);
 
 #ifdef CONFIG_AUTO_KPROFILES
-
-#ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
-#define kprofiles_events msm_drm_notifier
-#elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
-#define kprofiles_events mi_drm_notifier
-#elif defined(CONFIG_AUTO_KPROFILES_FB)
-#define kprofiles_events fb_event
-#endif
-
 static inline int kp_notifier_callback(struct notifier_block *self,
 				       unsigned long event, void *data)
 {
-
 	struct kprofiles_events *evdata = data;
 	int *blank;
 
