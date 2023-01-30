@@ -109,14 +109,19 @@ EXPORT_SYMBOL(kp_set_mode);
  *
  * usage exmaple:
  *
- * if (kp_active_mode() == 3) {
- *	  things to be done when performance profile is active
- * } else if (kp_active_mode() == 2) {
- *	  things to be done when balanced profile is active
- * } else if (kp_active_mode() == 1) {
- *	  things to be done when battery profile is active
- * } else {
- *	  things to be done when kprofiles is disabled
+ * switch (kp_active_mode()) {
+ * case 1:
+ *	things to be done when battery profile is active
+ *	break;
+ * case 2:
+ *	things to be done when balanced profile is active
+ * 	break;
+ * case 3:
+ *	things to be done when performance profile is active
+ *	break;
+ * default:
+ *	things to be done when kprofiles is disabled
+ *	break;
  * }
  *
  */
