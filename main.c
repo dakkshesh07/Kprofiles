@@ -64,7 +64,7 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 		return;
 
 	if (unlikely(level > 3)) {
-		pr_err("%s: Invalid mode requested, Skipping mode change",
+		pr_err("%s: Invalid mode requested, Skipping mode change\n",
 		       __func__);
 		return;
 	}
@@ -92,7 +92,7 @@ void kp_set_mode(unsigned int level)
 #endif
 
 	if (unlikely(level > 3)) {
-		pr_err("%s: Invalid mode requested, Skipping mode change",
+		pr_err("%s: Invalid mode requested, Skipping mode change\n",
 		       __func__);
 		return;
 	}
@@ -137,7 +137,8 @@ int kp_active_mode(void)
 
 	if (unlikely(kp_mode > 3)) {
 		kp_mode = 0;
-		pr_info("Invalid value passed, falling back to level 0\n");
+		pr_info("%s: Invalid value passed, falling back to level 0\n",
+			__func__);
 	}
 
 	return kp_mode;
