@@ -91,14 +91,16 @@ void kp_set_mode(unsigned int level)
 		return;
 #endif
 
+	if (!auto_kprofiles)
+		return;
+
 	if (unlikely(level > 3)) {
 		pr_err("%s: Invalid mode requested, Skipping mode change\n",
 		       __func__);
 		return;
 	}
 
-	if (auto_kprofiles)
-		kp_mode = level;
+	kp_mode = level;
 }
 EXPORT_SYMBOL(kp_set_mode);
 
