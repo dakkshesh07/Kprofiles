@@ -57,7 +57,9 @@ obj-$(CONFIG_ECHO)       += echo/
 4. Define the api function you need in the required file using extern, kprofiles can be used in various places like for example boosting drivers, below is an example of using kprofiles in kernel/fork.c to control cpu and ddr boosts during zygote forking using kp_active_mode() API.
 
 ```diff
++ #ifdef CONFIG_KPROFILES
 + extern int kp_active_mode(void);
++ #endif
 /*
  *  Ok, this is the main fork-routine.
  *
@@ -80,22 +82,38 @@ long _do_fork(unsigned long clone_flags,
 -       cpu_input_boost_kick_max(50);
 -       devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 50);
 -       devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
++ #ifdef CONFIG_KPROFILES
 +   /*
++    * Boost CPU and DDR for 60ms if performance mode is active.
++    * Boost CPU and DDR for 50ms if default mode is active to retain default behaviour.
++    * Boost CPU & DDR for 25ms if balanced profile is enabled
 +    * Dont boost CPU & DDR if battery saver profile is enabled
-+    * and boost CPU & DDR for 25ms if balanced profile is enabled
 +    */
-+       if (kp_active_mode() == 3 || kp_active_mode() == 0) {
-+           cpu_input_boost_kick_max(50);
++       switch (kp_active_mode()) {
++       case 0:
++           cpu_input_boost_kick_max(60);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 50);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
-+       } else if (kp_active_mode() == 2) {
-+           cpu_input_boost_kick_max(25);
++           break;
++       case 2:
++           cpu_input_boost_kick_max(60);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 25);
 +           devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 25);
-+       } else {
++           break;
++       case 3:
++           cpu_input_boost_kick_max(60);
++           devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 60);
++           devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 60);
++           break;
++       default:
 +           pr_info("Battery Profile Active, Skipping Boost...\n");
++           break;
 +       }
-    }
++ #else
++       cpu_input_boost_kick_max(60);
++       devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 50);
++       devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 50);
++ #endif
 ```
 
 and you are good to go!
