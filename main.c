@@ -227,7 +227,7 @@ static int __init kp_init(void)
 		pr_err("Failed to register notifier, err: %d\n", ret);
 
 	pr_info("Kprofiles " KPROFILES_VERSION
-		" loaded. Visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md for information.\n");
+		" loaded successfully. For further details, visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md\n");
 	pr_info("Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>.\n");
 
 	return ret;
