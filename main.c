@@ -61,9 +61,11 @@ static bool screen_on = true;
 static bool auto_kprofiles __read_mostly =
 	!IS_ENABLED(CONFIG_AUTO_KPROFILES_NONE);
 module_param(auto_kprofiles, bool, 0664);
+MODULE_PARM_DESC(auto_kprofiles, "Enable/disable automatic kernel profile management");
 
 static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
 module_param(kp_mode, int, 0664);
+MODULE_PARM_DESC(kp_mode, "Kernel profile mode");
 
 DEFINE_MUTEX(kplock);
 
