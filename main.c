@@ -22,7 +22,6 @@
  * License: GPL-2.0
  */
 
-
 #include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -33,8 +32,8 @@
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 #include <linux/fb.h>
 #endif
-#include <linux/notifier.h>
 #include "version.h"
+#include <linux/notifier.h>
 
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 #define KP_EVENT_BLANK MSM_DRM_EVENT_BLANK
@@ -83,8 +82,9 @@ DEFINE_SPINLOCK(kp_set_mode_lock);
  */
 static void kp_trigger_mode_change_event(void)
 {
-    unsigned int current_mode = kp_active_mode();
-    blocking_notifier_call_chain(&kp_mode_notifier, KP_MODE_CHANGE, (void *)current_mode);
+	unsigned int current_mode = kp_active_mode();
+	blocking_notifier_call_chain(&kp_mode_notifier, KP_MODE_CHANGE,
+				     (void *)current_mode);
 }
 
 /**
@@ -216,7 +216,7 @@ EXPORT_SYMBOL(kp_active_mode);
  */
 int kp_notifier_register_client(struct notifier_block *nb)
 {
-    return blocking_notifier_chain_register(&kp_mode_notifier, nb);
+	return blocking_notifier_chain_register(&kp_mode_notifier, nb);
 }
 EXPORT_SYMBOL(kp_notifier_register_client);
 
@@ -231,13 +231,13 @@ EXPORT_SYMBOL(kp_notifier_register_client);
  */
 int kp_notifier_unregister_client(struct notifier_block *nb)
 {
-    return blocking_notifier_chain_unregister(&kp_mode_notifier, nb);
+	return blocking_notifier_chain_unregister(&kp_mode_notifier, nb);
 }
 EXPORT_SYMBOL(kp_notifier_unregister_client);
 
 #ifdef CONFIG_AUTO_KPROFILES
 static inline int kp_display_notifier_callback(struct notifier_block *self,
-				       unsigned long event, void *data)
+					       unsigned long event, void *data)
 {
 	struct kp_events *evdata = data;
 	unsigned int blank;
@@ -308,12 +308,14 @@ static inline void kp_unregister_display_notifier(void)
 }
 #endif
 
-static ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+static ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr,
+			    char *buf)
 {
 	return scnprintf(buf, PAGE_SIZE, "%u\n", kp_mode);
 }
 
-static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr,
+			     const char *buf, size_t count)
 {
 	unsigned int new_mode;
 	int ret;
@@ -330,7 +332,8 @@ static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr, 
 	return count;
 }
 
-static struct kobj_attribute kp_mode_attribute = __ATTR(kp_mode, 0664, kp_mode_show, kp_mode_store);
+static struct kobj_attribute kp_mode_attribute =
+	__ATTR(kp_mode, 0664, kp_mode_show, kp_mode_store);
 
 static struct attribute *kp_attrs[] = {
 	&kp_mode_attribute.attr,
@@ -360,13 +363,15 @@ static int __init kp_init(void)
 
 	ret = kp_register_display_notifier();
 	if (ret) {
-		pr_err("Failed to register Kprofiles display notifier, err: %d\n", ret);
+		pr_err("Failed to register Kprofiles display notifier, err: %d\n",
+		       ret);
 		sysfs_remove_group(kp_kobj, &kp_attr_group);
 		kobject_put(kp_kobj);
 		return ret;
 	}
 
-	pr_info("Kprofiles " KPROFILES_VERSION " loaded successfully. For further details, visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md\n");
+	pr_info("Kprofiles " KPROFILES_VERSION
+		" loaded successfully. For further details, visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md\n");
 	pr_info("Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>.\n");
 
 	return ret;
