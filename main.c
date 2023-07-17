@@ -66,8 +66,8 @@ static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
 
 static struct kobject *kprofiles_kobj;
 
-DEFINE_MUTEX(kp_set_mode_rb);
-DEFINE_MUTEX(kp_set_mode);
+DEFINE_MUTEX(kp_set_mode_rb_lock);
+DEFINE_SPINLOCK(kp_set_mode_lock);
 
 /**
  * kp_set_mode_rollback - Change profile to a given mode for a specific duration
@@ -90,7 +90,7 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 	if (!auto_kp)
 		return;
 
-	mutex_lock(&kp_set_mode_rb);
+	mutex_lock(&kp_set_mode_rb_lock);
 	if (unlikely(level > 3)) {
 		pr_err("%s: Invalid mode requested, Skipping mode change\n",
 		       __func__);
@@ -101,7 +101,7 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 	kp_override = true;
 	msleep(duration_ms);
 	kp_override = false;
-	mutex_unlock(&kp_set_mode_rb);
+	mutex_unlock(&kp_set_mode_rb_lock);
 }
 EXPORT_SYMBOL(kp_set_mode_rollback);
 
@@ -124,7 +124,7 @@ void kp_set_mode(unsigned int level)
 	if (!auto_kp)
 		return;
 
-	mutex_lock(&kp_set_mode);
+	spin_lock(&kp_set_mode_lock);
 	if (unlikely(level > 3)) {
 		pr_err("%s: Invalid mode requested, Skipping mode change\n",
 		       __func__);
@@ -132,7 +132,7 @@ void kp_set_mode(unsigned int level)
 	}
 
 	kp_mode = level;
-	mutex_unlock(&kp_set_mode);
+	spin_unlock(&kp_set_mode_lock);
 }
 EXPORT_SYMBOL(kp_set_mode);
 
