@@ -66,7 +66,7 @@ static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
 
 static struct kobject *kprofiles_kobj;
 
-DEFINE_MUTEX(kplock);
+DEFINE_MUTEX(kp_set_mode_rb);
 
 /**
  * kp_set_mode_rollback - Change profile to a given mode for a specific duration
@@ -89,18 +89,18 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 	if (!auto_kp)
 		return;
 
+	mutex_lock(&kp_set_mode_rb);
 	if (unlikely(level > 3)) {
 		pr_err("%s: Invalid mode requested, Skipping mode change\n",
 		       __func__);
 		return;
 	}
 
-	mutex_lock(&kplock);
 	kp_override_mode = level;
 	kp_override = true;
 	msleep(duration_ms);
 	kp_override = false;
-	mutex_unlock(&kplock);
+	mutex_unlock(&kp_set_mode_rb);
 }
 EXPORT_SYMBOL(kp_set_mode_rollback);
 
