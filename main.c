@@ -253,7 +253,7 @@ static inline void kprofiles_unregister_notifier(void)
 
 static ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
-	return sprintf(buf, "%u\n", kp_mode);
+	return scnprintf(buf, PAGE_SIZE, "%u\n", kp_mode);
 }
 
 static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
