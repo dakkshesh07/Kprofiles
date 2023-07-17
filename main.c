@@ -40,17 +40,17 @@
 #define KP_EVENT_BLANK MSM_DRM_EVENT_BLANK
 #define KP_BLANK_POWERDOWN MSM_DRM_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK MSM_DRM_BLANK_UNBLANK
-#define kprofiles_events msm_drm_notifier
+#define kp_events msm_drm_notifier
 #elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
 #define KP_EVENT_BLANK MI_DRM_EVENT_BLANK
 #define KP_BLANK_POWERDOWN MI_DRM_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK MI_DRM_BLANK_UNBLANK
-#define kprofiles_events mi_drm_notifier
+#define kp_events mi_drm_notifier
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
 #define KP_EVENT_BLANK FB_EVENT_BLANK
 #define KP_BLANK_POWERDOWN FB_BLANK_POWERDOWN
 #define KP_BLANK_UNBLANK FB_BLANK_UNBLANK
-#define kprofiles_events fb_event
+#define kp_events fb_event
 #endif
 
 static BLOCKING_NOTIFIER_HEAD(kp_mode_notifier);
@@ -69,7 +69,7 @@ MODULE_PARM_DESC(auto_kp, "Enable/disable automatic kernel profile management");
 
 static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
 
-static struct kobject *kprofiles_kobj;
+static struct kobject *kp_kobj;
 
 DEFINE_MUTEX(kp_set_mode_rb_lock);
 DEFINE_SPINLOCK(kp_set_mode_lock);
@@ -236,10 +236,10 @@ int kp_notifier_unregister_client(struct notifier_block *nb)
 EXPORT_SYMBOL(kp_notifier_unregister_client);
 
 #ifdef CONFIG_AUTO_KPROFILES
-static inline int kp_notifier_callback(struct notifier_block *self,
+static inline int kp_display_notifier_callback(struct notifier_block *self,
 				       unsigned long event, void *data)
 {
-	struct kprofiles_events *evdata = data;
+	struct kp_events *evdata = data;
 	unsigned int blank;
 
 	if (event != KP_EVENT_BLANK)
@@ -268,42 +268,42 @@ static inline int kp_notifier_callback(struct notifier_block *self,
 	return NOTIFY_OK;
 }
 
-static struct notifier_block kp_notifier_block = {
-	.notifier_call = kp_notifier_callback,
+static struct notifier_block kp_display_notifier_block = {
+	.notifier_call = kp_display_notifier_callback,
 };
 
-static int kprofiles_register_notifier(void)
+static int kp_register_display_notifier(void)
 {
 	int ret = 0;
 
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
-	ret = msm_drm_register_client(&kp_notifier_block);
+	ret = msm_drm_register_client(&kp_display_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
-	ret = mi_drm_register_client(&kp_notifier_block);
+	ret = mi_drm_register_client(&kp_display_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
-	ret = fb_register_client(&kp_notifier_block);
+	ret = fb_register_client(&kp_display_notifier_block);
 #endif
 
 	return ret;
 }
 
-static void kprofiles_unregister_notifier(void)
+static void kp_unregister_display_notifier(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
-	msm_drm_unregister_client(&kp_notifier_block);
+	msm_drm_unregister_client(&kp_display_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_MI_DRM)
-	mi_drm_unregister_client(&kp_notifier_block);
+	mi_drm_unregister_client(&kp_display_notifier_block);
 #elif defined(CONFIG_AUTO_KPROFILES_FB)
-	fb_unregister_client(&kp_notifier_block);
+	fb_unregister_client(&kp_display_notifier_block);
 #endif
 }
 
 #else
-static inline int kprofiles_register_notifier(void)
+static inline int kp_register_display_notifier(void)
 {
 	return 0;
 }
-static inline void kprofiles_unregister_notifier(void)
+static inline void kp_unregister_display_notifier(void)
 {
 }
 #endif
@@ -332,37 +332,37 @@ static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr, 
 
 static struct kobj_attribute kp_mode_attribute = __ATTR(kp_mode, 0664, kp_mode_show, kp_mode_store);
 
-static struct attribute *kprofiles_attrs[] = {
+static struct attribute *kp_attrs[] = {
 	&kp_mode_attribute.attr,
 	NULL,
 };
 
-static struct attribute_group kprofiles_attr_group = {
-	.attrs = kprofiles_attrs,
+static struct attribute_group kp_attr_group = {
+	.attrs = kp_attrs,
 };
 
 static int __init kp_init(void)
 {
 	int ret = 0;
 
-	kprofiles_kobj = kobject_create_and_add("kprofiles", kernel_kobj);
-	if (!kprofiles_kobj) {
-		pr_err("Failed to create kprofiles kobject\n");
+	kp_kobj = kobject_create_and_add("kprofiles", kernel_kobj);
+	if (!kp_kobj) {
+		pr_err("Failed to create Kprofiles kobject\n");
 		return -ENOMEM;
 	}
 
-	ret = sysfs_create_group(kprofiles_kobj, &kprofiles_attr_group);
+	ret = sysfs_create_group(kp_kobj, &kp_attr_group);
 	if (ret) {
 		pr_err("Failed to create sysfs attributes for Kprofiles\n");
-		kobject_put(kprofiles_kobj);
+		kobject_put(kp_kobj);
 		return ret;
 	}
 
-	ret = kprofiles_register_notifier();
+	ret = kp_register_display_notifier();
 	if (ret) {
-		pr_err("Failed to register notifier, err: %d\n", ret);
-		sysfs_remove_group(kprofiles_kobj, &kprofiles_attr_group);
-		kobject_put(kprofiles_kobj);
+		pr_err("Failed to register Kprofiles display notifier, err: %d\n", ret);
+		sysfs_remove_group(kp_kobj, &kp_attr_group);
+		kobject_put(kp_kobj);
 		return ret;
 	}
 
@@ -375,9 +375,9 @@ module_init(kp_init);
 
 static void __exit kp_exit(void)
 {
-	kprofiles_unregister_notifier();
-	sysfs_remove_group(kprofiles_kobj, &kprofiles_attr_group);
-	kobject_put(kprofiles_kobj);
+	kp_unregister_display_notifier();
+	sysfs_remove_group(kp_kobj, &kp_attr_group);
+	kobject_put(kp_kobj);
 }
 module_exit(kp_exit);
 
