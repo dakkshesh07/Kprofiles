@@ -58,14 +58,13 @@ static bool kp_override;
 static bool screen_on = true;
 #endif
 
-static bool auto_kprofiles __read_mostly =
-	!IS_ENABLED(CONFIG_AUTO_KPROFILES_NONE);
-module_param(auto_kprofiles, bool, 0664);
-MODULE_PARM_DESC(auto_kprofiles, "Enable/disable automatic kernel profile management");
+static bool auto_kp __read_mostly = !IS_ENABLED(CONFIG_AUTO_KPROFILES_NONE);
+module_param(auto_kp, bool, 0664);
+MODULE_PARM_DESC(auto_kp, "Enable/disable automatic kernel profile management");
 
 static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
-module_param(kp_mode, int, 0664);
-MODULE_PARM_DESC(kp_mode, "Kernel profile mode");
+
+static struct kobject *kprofiles_kobj;
 
 DEFINE_MUTEX(kplock);
 
@@ -87,7 +86,7 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 		return;
 #endif
 
-	if (!auto_kprofiles)
+	if (!auto_kp)
 		return;
 
 	if (unlikely(level > 3)) {
@@ -121,7 +120,7 @@ void kp_set_mode(unsigned int level)
 		return;
 #endif
 
-	if (!auto_kprofiles)
+	if (!auto_kp)
 		return;
 
 	if (unlikely(level > 3)) {
@@ -164,7 +163,7 @@ EXPORT_SYMBOL(kp_set_mode);
 int kp_active_mode(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES
-	if (!screen_on && auto_kprofiles)
+	if (!screen_on && auto_kp)
 		return 1;
 #endif
 
@@ -252,13 +251,64 @@ static inline void kprofiles_unregister_notifier(void)
 }
 #endif
 
+static ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%u\n", kp_mode);
+}
+
+static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	unsigned int new_mode;
+	int ret;
+
+	ret = kstrtouint(buf, 10, &new_mode);
+	if (ret)
+		return ret;
+
+	if (new_mode > 3)
+		return -EINVAL;
+
+	kp_set_mode(new_mode);
+
+	return count;
+}
+
+static struct kobj_attribute kp_mode_attribute = __ATTR(kp_mode, 0664, kp_mode_show, kp_mode_store);
+
+static struct attribute *kprofiles_attrs[] = {
+	&kp_mode_attribute.attr,
+	NULL,
+};
+
+static struct attribute_group kprofiles_attr_group = {
+	.attrs = kprofiles_attrs,
+};
+
 static int __init kp_init(void)
 {
 	int ret = 0;
 
+	kprofiles_kobj = kobject_create_and_add("kprofiles", kernel_kobj);
+	if (!kprofiles_kobj) {
+		pr_err("Failed to create kprofiles kobject\n");
+		return -ENOMEM;
+	}
+
+	ret = sysfs_create_group(kprofiles_kobj, &kprofiles_attr_group);
+	if (ret) {
+		pr_err("Failed to create sysfs attributes for Kprofiles\n");
+		kobject_put(kprofiles_kobj);
+		return ret;
+	}
+
+	return ret;
+
 	ret = kprofiles_register_notifier();
-	if (ret)
+	if (ret) {
 		pr_err("Failed to register notifier, err: %d\n", ret);
+		sysfs_remove_group(kprofiles_kobj, &kprofiles_attr_group);
+		kobject_put(kprofiles_kobj);
+	}
 
 	pr_info("Kprofiles " KPROFILES_VERSION " loaded successfully. For further details, visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md\n");
 	pr_info("Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>.\n");
@@ -270,6 +320,8 @@ module_init(kp_init);
 static void __exit kp_exit(void)
 {
 	kprofiles_unregister_notifier();
+	sysfs_remove_group(kprofiles_kobj, &kprofiles_attr_group);
+	kobject_put(kprofiles_kobj);
 }
 module_exit(kp_exit);
 
