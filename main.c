@@ -73,19 +73,7 @@ static struct kobject *kp_kobj;
 DEFINE_MUTEX(kp_set_mode_rb_lock);
 DEFINE_SPINLOCK(kp_set_mode_lock);
 
-/**
- * kp_trigger_mode_change_event - Trigger a mode change event
- *
- * This function triggers a mode change event by calling the blocking notifier
- * chain for kp_mode_notifier. It informs all registered listeners about the
- * change in the profile mode.
- */
-static void kp_trigger_mode_change_event(void)
-{
-	unsigned int current_mode = kp_active_mode();
-	blocking_notifier_call_chain(&kp_mode_notifier, KP_MODE_CHANGE,
-				     (void *)current_mode);
-}
+static void kp_trigger_mode_change_event(void);
 
 /**
  * kp_set_mode_rollback - Change profile to a given mode for a specific duration
@@ -204,6 +192,20 @@ int kp_active_mode(void)
 	return kp_mode;
 }
 EXPORT_SYMBOL(kp_active_mode);
+
+/**
+ * kp_trigger_mode_change_event - Trigger a mode change event
+ *
+ * This function triggers a mode change event by calling the blocking notifier
+ * chain for kp_mode_notifier. It informs all registered listeners about the
+ * change in the profile mode.
+ */
+static void kp_trigger_mode_change_event(void)
+{
+	unsigned int current_mode = kp_active_mode();
+	blocking_notifier_call_chain(&kp_mode_notifier, KP_MODE_CHANGE,
+				     (void *)current_mode);
+}
 
 /**
  * kp_notifier_register_client - Register a notifier client for profile mode changes
