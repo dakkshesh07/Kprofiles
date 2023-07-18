@@ -204,7 +204,7 @@ static void kp_trigger_mode_change_event(void)
 {
 	unsigned int current_mode = kp_active_mode();
 	blocking_notifier_call_chain(&kp_mode_notifier, KP_MODE_CHANGE,
-				     (void *)current_mode);
+				     (void *)(uintptr_t)current_mode);
 }
 
 /**
