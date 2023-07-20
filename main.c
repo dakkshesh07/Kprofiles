@@ -113,6 +113,11 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 }
 EXPORT_SYMBOL(kp_set_mode_rollback);
 
+static void __kp_set_mode(unsigned int level)
+{
+	kp_mode = level;
+}
+
 /**
  * kp_set_mode - Change profile to a given mode
  * @level: The profile mode level to set (0-3)
@@ -139,7 +144,7 @@ void kp_set_mode(unsigned int level)
 		return;
 	}
 
-	kp_mode = level;
+	__kp_set_mode(level);
 	kp_trigger_mode_change_event();
 	spin_unlock(&kp_set_mode_lock);
 }
@@ -329,7 +334,7 @@ static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr,
 	if (new_mode > 3)
 		return -EINVAL;
 
-	kp_set_mode(new_mode);
+	__kp_set_mode(new_mode);
 
 	return count;
 }
