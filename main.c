@@ -113,7 +113,7 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 }
 EXPORT_SYMBOL(kp_set_mode_rollback);
 
-static void __kp_set_mode(unsigned int level)
+static __always_inline void __kp_set_mode(unsigned int level)
 {
 	kp_mode = level;
 }
@@ -205,7 +205,7 @@ EXPORT_SYMBOL(kp_active_mode);
  * chain for kp_mode_notifier. It informs all registered listeners about the
  * change in the profile mode.
  */
-static void kp_trigger_mode_change_event(void)
+static __always_inline void kp_trigger_mode_change_event(void)
 {
 	unsigned int current_mode = kp_active_mode();
 	blocking_notifier_call_chain(&kp_mode_notifier, KP_MODE_CHANGE,
@@ -279,7 +279,7 @@ static struct notifier_block kp_display_notifier_block = {
 	.notifier_call = kp_display_notifier_callback,
 };
 
-static int kp_register_display_notifier(void)
+static inline int kp_register_display_notifier(void)
 {
 	int ret = 0;
 
@@ -294,7 +294,7 @@ static int kp_register_display_notifier(void)
 	return ret;
 }
 
-static void kp_unregister_display_notifier(void)
+static inline void kp_unregister_display_notifier(void)
 {
 #ifdef CONFIG_AUTO_KPROFILES_MSM_DRM
 	msm_drm_unregister_client(&kp_display_notifier_block);
@@ -315,13 +315,13 @@ static inline void kp_unregister_display_notifier(void)
 }
 #endif
 
-static ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr,
+static inline ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr,
 			    char *buf)
 {
 	return scnprintf(buf, PAGE_SIZE, "%u\n", kp_mode);
 }
 
-static ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr,
+static inline ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr,
 			     const char *buf, size_t count)
 {
 	unsigned int new_mode;
