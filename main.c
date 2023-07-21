@@ -68,7 +68,7 @@ static bool auto_kp __read_mostly = !IS_ENABLED(CONFIG_AUTO_KPROFILES_NONE);
 module_param(auto_kp, bool, 0664);
 MODULE_PARM_DESC(auto_kp, "Enable/disable automatic kernel profile management");
 
-static unsigned int kp_mode = CONFIG_DEFAULT_KP_MODE;
+static unsigned int kp_mode = CONFIG_KP_DEFAULT_MODE;
 
 static struct kobject *kp_kobj;
 

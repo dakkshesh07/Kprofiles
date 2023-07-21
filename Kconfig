@@ -18,7 +18,7 @@ config KPROFILES
 
 if KPROFILES
 
-config DEFAULT_KP_MODE
+config KP_DEFAULT_MODE
 	int "Default mode number for kp_mode"
 	range 0 3
 	default 0
