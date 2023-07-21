@@ -78,4 +78,11 @@ config AUTO_KPROFILES_NONE
 
 endchoice
 
+config KP_VERBOSE_DEBUG
+	bool "Verbose Kprofiles debugging"
+	default n
+	help
+	  Say Y here if you are testing Kprofiles or trying to
+	  debug and indentify problems.
+
 endif # if KPROFILES

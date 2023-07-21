@@ -75,6 +75,15 @@ static struct kobject *kp_kobj;
 DEFINE_MUTEX(kp_set_mode_rb_lock);
 DEFINE_SPINLOCK(kp_set_mode_lock);
 
+#ifdef CONFIG_KP_VERBOSE_DEBUG
+#define kp_dbg(fmt, ...) pr_debug(fmt, ##__VA_ARGS__)
+#else
+#define kp_dbg(fmt, ...)
+#endif
+
+#define kp_err(fmt, ...) pr_err(fmt, ##__VA_ARGS__)
+#define kp_info(fmt, ...) pr_info(fmt, ##__VA_ARGS__)
+
 static void kp_trigger_mode_change_event(void);
 
 /**
@@ -91,16 +100,20 @@ static void kp_trigger_mode_change_event(void);
 void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 {
 #ifdef CONFIG_AUTO_KPROFILES
-	if (!screen_on)
+	if (!screen_on) {
+		kp_dbg("Screen is off, skipping mode change.\n");
 		return;
+	}
 #endif
 
-	if (!auto_kp)
+	if (!auto_kp) {
+		kp_dbg("Auto Kprofiles is disabled, skipping mode change.\n");
 		return;
+	}
 
 	mutex_lock(&kp_set_mode_rb_lock);
 	if (unlikely(level > 3)) {
-		pr_err("Invalid mode requested, Skipping mode change\n");
+		kp_err("Invalid mode requested, skipping mode change.\n");
 		return;
 	}
 
@@ -137,17 +150,21 @@ void kp_set_mode(unsigned int level)
 	int ret = 0;
 
 #ifdef CONFIG_AUTO_KPROFILES
-	if (!screen_on)
+	if (!screen_on) {
+		kp_dbg("Screen is off, skipping mode change.\n");
 		return;
+	}
 #endif
 
-	if (!auto_kp)
+	if (!auto_kp) {
+		kp_dbg("Auto Kprofiles is disabled, skipping mode change.\n");
 		return;
+	}
 
 	spin_lock(&kp_set_mode_lock);
 	ret = __kp_set_mode(level);
 	if (ret) {
-		pr_err("Invalid mode requested, Skipping mode change\n");
+		kp_err("Invalid mode requested, skipping mode change.\n");
 		return;
 	}
 
@@ -196,7 +213,7 @@ int kp_active_mode(void)
 	if (unlikely(kp_mode > 3)) {
 		kp_mode = 0;
 		kp_trigger_mode_change_event();
-		pr_info("Invalid value passed, falling back to level 0\n");
+		kp_err("Invalid value passed, falling back to level 0\n");
 	}
 
 	return kp_mode;
@@ -339,7 +356,7 @@ static inline ssize_t kp_mode_store(struct kobject *kobj,
 
 	ret = __kp_set_mode(new_mode);
 	if (ret) {
-		pr_err("User changed mode is invalid, Skipping mode change\n");
+		kp_err("User changed mode is invalid, skipping mode change.\n");
 		return ret;
 	}
 
@@ -364,29 +381,29 @@ static int __init kp_init(void)
 
 	kp_kobj = kobject_create_and_add("kprofiles", kernel_kobj);
 	if (!kp_kobj) {
-		pr_err("Failed to create Kprofiles kobject\n");
+		kp_err("Failed to create Kprofiles kobject\n");
 		return -ENOMEM;
 	}
 
 	ret = sysfs_create_group(kp_kobj, &kp_attr_group);
 	if (ret) {
-		pr_err("Failed to create sysfs attributes for Kprofiles\n");
+		kp_err("Failed to create sysfs attributes for Kprofiles\n");
 		kobject_put(kp_kobj);
 		return ret;
 	}
 
 	ret = kp_register_display_notifier();
 	if (ret) {
-		pr_err("Failed to register Kprofiles display notifier, err: %d\n",
+		kp_err("Failed to register Kprofiles display notifier, err: %d\n",
 		       ret);
 		sysfs_remove_group(kp_kobj, &kp_attr_group);
 		kobject_put(kp_kobj);
 		return ret;
 	}
 
-	pr_info("Kprofiles " KPROFILES_VERSION
+	kp_info("Kprofiles " KPROFILES_VERSION
 		" loaded successfully. For further details, visit https://github.com/dakkshesh07/Kprofiles/blob/main/README.md\n");
-	pr_info("Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>.\n");
+	kp_info("Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>.\n");
 
 	return ret;
 }
