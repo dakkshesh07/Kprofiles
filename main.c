@@ -114,9 +114,13 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 }
 EXPORT_SYMBOL(kp_set_mode_rollback);
 
-static __always_inline void __kp_set_mode(unsigned int level)
+static __always_inline int __kp_set_mode(unsigned int level)
 {
+	if (unlikely(level > 3))
+		return -EINVAL;
+
 	kp_mode = level;
+	return 0
 }
 
 /**
@@ -130,6 +134,8 @@ static __always_inline void __kp_set_mode(unsigned int level)
  */
 void kp_set_mode(unsigned int level)
 {
+	int ret = 0;
+
 #ifdef CONFIG_AUTO_KPROFILES
 	if (!screen_on)
 		return;
@@ -139,12 +145,12 @@ void kp_set_mode(unsigned int level)
 		return;
 
 	spin_lock(&kp_set_mode_lock);
-	if (unlikely(level > 3)) {
-		pr_err("%s: Invalid mode requested, Skipping mode change\n");
+	ret = __kp_set_mode(level);
+	if (ret) {
+		pr_err("Invalid mode requested, Skipping mode change\n");
 		return;
 	}
 
-	__kp_set_mode(level);
 	kp_trigger_mode_change_event();
 	spin_unlock(&kp_set_mode_lock);
 }
@@ -314,14 +320,15 @@ static inline void kp_unregister_display_notifier(void)
 }
 #endif
 
-static inline ssize_t kp_mode_show(struct kobject *kobj, struct kobj_attribute *attr,
-			    char *buf)
+static inline ssize_t kp_mode_show(struct kobject *kobj,
+				   struct kobj_attribute *attr, char *buf)
 {
 	return scnprintf(buf, PAGE_SIZE, "%u\n", kp_mode);
 }
 
-static inline ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute *attr,
-			     const char *buf, size_t count)
+static inline ssize_t kp_mode_store(struct kobject *kobj,
+				    struct kobj_attribute *attr,
+				    const char *buf, size_t count)
 {
 	unsigned int new_mode;
 	int ret;
@@ -330,10 +337,11 @@ static inline ssize_t kp_mode_store(struct kobject *kobj, struct kobj_attribute 
 	if (ret)
 		return ret;
 
-	if (new_mode > 3)
-		return -EINVAL;
-
-	__kp_set_mode(new_mode);
+	ret = __kp_set_mode(new_mode);
+	if (ret) {
+		pr_err("User changed mode is invalid, Skipping mode change\n");
+		return ret;
+	}
 
 	return count;
 }
