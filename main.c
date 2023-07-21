@@ -100,7 +100,7 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 
 	mutex_lock(&kp_set_mode_rb_lock);
 	if (unlikely(level > 3)) {
-		pr_err("%s: Invalid mode requested, Skipping mode change\n");
+		pr_err("Invalid mode requested, Skipping mode change\n");
 		return;
 	}
 
@@ -120,7 +120,7 @@ static __always_inline int __kp_set_mode(unsigned int level)
 		return -EINVAL;
 
 	kp_mode = level;
-	return 0
+	return 0;
 }
 
 /**
@@ -196,7 +196,7 @@ int kp_active_mode(void)
 	if (unlikely(kp_mode > 3)) {
 		kp_mode = 0;
 		kp_trigger_mode_change_event();
-		pr_info("%s: Invalid value passed, falling back to level 0\n");
+		pr_info("Invalid value passed, falling back to level 0\n");
 	}
 
 	return kp_mode;
