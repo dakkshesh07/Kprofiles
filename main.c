@@ -76,7 +76,7 @@ DEFINE_MUTEX(kp_set_mode_rb_lock);
 DEFINE_SPINLOCK(kp_set_mode_lock);
 
 #ifdef CONFIG_KP_VERBOSE_DEBUG
-#define kp_dbg(fmt, ...) pr_debug(fmt, ##__VA_ARGS__)
+#define kp_dbg(fmt, ...) pr_info(fmt, ##__VA_ARGS__)
 #else
 #define kp_dbg(fmt, ...)
 #endif
