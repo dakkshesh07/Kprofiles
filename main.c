@@ -18,7 +18,7 @@
  * https://github.com/dakkshesh07/Kprofiles/blob/main/README.md
  *
  * Copyright (C) 2021-2023 Dakkshesh <dakkshesh5@gmail.com>
- * Version: 5.0.3
+ * Version: 6.0.0
  * License: GPL-2.0
  */
 
