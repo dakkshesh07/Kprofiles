@@ -43,7 +43,7 @@ choice
 
 config AUTO_KPROFILES_MSM_DRM
 	bool "Auto Kprofiles using msm_drm_notifier"
-	depends on DRM_MSM
+	depends on DRM_MSM || QGKI
 	select AUTO_KPROFILES
 	help
 	  Select this to enable Kprofile's automatic mode changer via msm_drm_notifier.
