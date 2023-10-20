@@ -111,12 +111,12 @@ void kp_set_mode_rollback(unsigned int level, unsigned int duration_ms)
 		return;
 	}
 
-	mutex_lock(&kp_set_mode_rb_lock);
 	if (unlikely(level > 3)) {
 		kp_err("Invalid mode requested, skipping mode change.\n");
 		return;
 	}
 
+	mutex_lock(&kp_set_mode_rb_lock);
 	kp_override_mode = level;
 	kp_override = true;
 	kp_trigger_mode_change_event();
